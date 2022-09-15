@@ -1,71 +1,67 @@
-import React from "react";
-import { useFonts } from 'expo-font';
-import AppLoading from 'expo-app-loading';
-import { useState } from 'react'
-import AsyncStorage from "@react-native-async-storage/async-storage";
-import { View, Modal, StyleSheet, TextInput, Text, Image, TouchableOpacity, Alert, Pressable } from "react-native";
+import AppLoading from "expo-app-loading";
+import { useFonts } from "expo-font";
+import React, { useState } from "react";
+
+import {
+  Alert, Image, Modal,
+  StyleSheet, Text, TextInput, TouchableOpacity, View
+} from "react-native";
 
 const Calculaora = () => {
-
   const [modalVisible, setModalVisible] = useState(false);
   const [valor, setValor] = useState(valor);
 
-  const [number, onChangeNumber] = useState('');
-  const [number1, onChangeNumber1] = useState('');
-
-
-
+  const [number, onChangeNumber] = useState("");
+  const [number1, onChangeNumber1] = useState(0);
 
   let [fontsLoaded] = useFonts({
-    'PoppinsMedium': require('./src/fonts/Poppins/PoppinsMedium.ttf'),
+    PoppinsMedium: require("./src/fonts/Poppins/PoppinsMedium.ttf"),
   });
   if (!fontsLoaded) {
     return <AppLoading />;
   }
+  function mais() {
+    onChangeNumber((pastNumber) => Number(pastNumber) + Number(0.01));
+    console.log(number);
+  }
+  function menos() {
+    onChangeNumber((pastNumber) => pastNumber > 0 ? Number(pastNumber) - Number(0.01) : 0);
+    console.log(number);
+  }
   function onModal() {
-    setModalVisible(true)
-
+    setModalVisible(true);
   }
   function onPress() {
-
     var aDilatar = Number(number1);
     var interferencia = Number(number);
     const folgaMontagem = aDilatar / 1000;
     const alfa = 0.000011454;
-    const deltaT = ((interferencia + folgaMontagem) / aDilatar) / alfa;
+    const deltaT = (interferencia + folgaMontagem) / aDilatar / alfa;
     const ta = 20;
     const deltaP = 28;
     var temperatura = Math.round(deltaT + deltaP + ta);
-    setValor(temperatura)
+    setValor(temperatura);
     if (aDilatar == "" || interferencia == "") {
-      Alert.alert('Insira um número válido');
+      Alert.alert("Insira um número válido");
     } else {
-      onModal()
+      onModal();
       //Alert.alert('Aquecer a ' + temperatura + 'º'+'.')
     }
   }
 
-
   return (
     <View style={styles.back}>
       <View style={styles.container}>
-
-        <Text style={styles.tit} >
-          DILATAÇÃO TÉRMICA
-        </Text>
+        <Text style={styles.tit}>DILATAÇÃO TÉRMICA</Text>
         <Image
-          style={{ width: '100%' }}
-          source={require('../dilatacao/images/calc.png')}
-          resizeMode='contain'
-
-
+          style={{ width: "100%" }}
+          source={require("../dilatacao/images/calc.png")}
+          resizeMode="contain"
         />
-        <Text style={styles.parag} >
-          Medida encontrada no diâmetro interno da
-          peça a ser aquecida em mm.
+        <Text style={styles.parag}>
+          Medida encontrada no diâmetro interno da peça a ser aquecida em mm.
         </Text>
         <TextInput
-
           style={styles.input}
           onChangeText={onChangeNumber1}
           value={number1}
@@ -73,146 +69,180 @@ const Calculaora = () => {
           keyboardType="numeric"
           maxLength={7}
         />
-        <Text style={styles.parag1} >
-          Diferença entre os diâmetros da peça e do
-          local de montagem em mm.
+        <Text style={styles.parag1}>
+          Diferença entre os diâmetros da peça e do local de montagem em mm.
         </Text>
-        <TextInput
-          step="0.01"
-          style={styles.input1}
-          onChangeText={onChangeNumber}
-          value={number}
-          placeholder="0,00"
-          keyboardType="numeric"
-          maxLength={4}
-
-        />
+        <View style={styles.maisContainer}>
+          <TouchableOpacity style={styles.menos} onPress={menos}>
+            <Text style={styles.calcular}>-</Text>
+          </TouchableOpacity>
+          <TextInput
+            style={styles.input1}
+            placeholder="0,00"
+            value={number.toString()}
+            showSoftInputOnFocus={false}
+            maxLength={4}
+          />
+          <TouchableOpacity style={styles.mais} onPress={mais}>
+            <Text style={styles.calcular}>+</Text>
+          </TouchableOpacity>
+        </View>
 
         <TouchableOpacity
           style={styles.button}
           onPress={onPress}
-        //onPress={() => {onPress(); onModal()}}
+          //onPress={() => {onPress(); onModal()}}
         >
           <Text style={styles.calcular}> CALCULAR</Text>
         </TouchableOpacity>
         <Modal
           transparent={true}
-          animationType='fade'
+          animationType="fade"
           visible={modalVisible}
           onRequestClose={() => setModalVisible(false)}
         >
           <View style={styles.modal}>
             <View style={styles.modal1}>
               <Text style={styles.modalText}>
-                {'Aquecer a ' + valor + '°.'}
-
+                {"Aquecer a " + valor + "°."}
               </Text>
               <TouchableOpacity
                 style={styles.button1}
-                onPress={() => setModalVisible(false)}>
+                onPress={() => setModalVisible(false)}
+              >
                 <Text style={styles.calcular1}>VOLTAR</Text>
               </TouchableOpacity>
             </View>
           </View>
         </Modal>
-      </View >
-    </View >
+      </View>
+    </View>
   );
 };
 
 const styles = StyleSheet.create({
   back: {
-    backgroundColor: 'rgba(244, 244, 244, 1)',
-    height: '100%',
-    justifyContent: 'center'
+    backgroundColor: "rgba(244, 244, 244, 1)",
+    height: "100%",
+    justifyContent: "center",
   },
   container: {
-    backgroundColor: 'rgba(244, 244, 244, 1)',
+    backgroundColor: "rgba(244, 244, 244, 1)",
     marginHorizontal: 35,
   },
 
   input: {
-    backgroundColor: 'white',
+    width: "100%",
+    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: 'rgba(136, 136, 136, 0.3)',
+    borderColor: "rgba(136, 136, 136, 0.3)",
     padding: 10,
     borderRadius: 5,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 30,
     fontSize: 16,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: "PoppinsMedium",
   },
   input1: {
-    backgroundColor: 'white',
+    backgroundColor: "white",
     borderWidth: 1,
-    borderColor: 'rgba(136, 136, 136, 0.3)',
+    borderColor: "rgba(136, 136, 136, 0.3)",
     padding: 10,
-    borderRadius: 5,
-    textAlign: 'center',
+    textAlign: "center",
     marginBottom: 50,
     fontSize: 16,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: "PoppinsMedium",
+    width: '70%',
+    height: 50,
+  },
+  maisContainer: {
+    justifyContent: "center",
+    flexDirection: "row",
+    marginHorizontal: 0,
+    textAlign: "center",
+  },
+  mais: {
+    width: '15%',
+    backgroundColor: "rgba(24, 144, 255, 0.3)",
+    height: 50,
+    textAlign: "center",
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomRightRadius: 5,
+    borderTopRightRadius: 5,
+    right: 0,
+  },
+  menos: {
+    width: '15%',
+    backgroundColor: "rgba(255, 0, 0, 0.3)",
+    height: 50,
+    textAlign: "center",
+    alignContent: "center",
+    alignItems: "center",
+    justifyContent: "center",
+    borderBottomLeftRadius: 5,
+    borderTopLeftRadius: 5,
+    left: 0,
   },
   tit: {
-    fontFamily: 'PoppinsMedium',
+    fontFamily: "PoppinsMedium",
     marginBottom: 60,
     fontSize: 24,
-    textAlign: 'center',
-
+    textAlign: "center",
   },
   parag: {
     fontSize: 16,
-    textAlign: 'center',
+    textAlign: "center",
     marginTop: 40,
     padding: 10,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: "PoppinsMedium",
   },
   parag1: {
     fontSize: 16,
-    textAlign: 'center',
-    fontFamily: 'PoppinsMedium',
+    textAlign: "center",
+    fontFamily: "PoppinsMedium",
     padding: 10,
   },
   calc: {
-    resizeMode: 'contain',
+    resizeMode: "contain",
     width: 120,
-
   },
   button: {
     alignItems: "center",
     backgroundColor: "rgba(24, 144, 255, 1)",
     padding: 10,
     borderRadius: 5,
+    width: 320,
   },
   calcular: {
     fontSize: 20,
-    fontFamily: 'PoppinsMedium',
+    color: "white",
+    fontFamily: "PoppinsMedium",
   },
   modal: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: 'rgba(0, 0, 0, 0.2)'
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "rgba(0, 0, 0, 0.2)",
   },
   modal1: {
-    backgroundColor: 'rgba(244, 244, 244, 1)',
+    backgroundColor: "rgba(244, 244, 244, 1)",
     borderRadius: 10,
     padding: 35,
     width: 250,
-    height:150,
-    alignItems: 'center'
-  }
-  ,
+    height: 150,
+    alignItems: "center",
+  },
   modalText: {
     fontSize: 20,
-    fontFamily: 'PoppinsMedium',
-    alignItems: 'center'
+    fontFamily: "PoppinsMedium",
+    alignItems: "center",
   },
   modalText1: {
     fontSize: 10,
-    fontFamily: 'PoppinsMedium',
-    justifyContent: 'center'
-
+    fontFamily: "PoppinsMedium",
+    justifyContent: "center",
   },
   button1: {
     alignItems: "center",
@@ -222,10 +252,8 @@ const styles = StyleSheet.create({
   },
   calcular1: {
     fontSize: 12,
-    fontFamily: 'PoppinsMedium',
+    fontFamily: "PoppinsMedium",
   },
-
-
 });
 
 export default Calculaora;
